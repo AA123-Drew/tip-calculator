@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" class="dark"> <!-- Default to dark mode -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tip Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease; /* Smooth transition for background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+            padding: 1rem; /* Add some padding for smaller screens */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        /* Default (Light Mode) Body Background */
+        body {
+            background-color: #f0f2f5; /* Light gray background */
+        }
+
+        /* Dark Mode Body Background */
+        html.dark body {
+            background-color: #1a202c; /* Dark background */
+        }
+
+        /* Ensure the main container is centered and responsive */
+        .container {
+            max-width: 400px; /* Max width for larger screens */
+            width: 100%; /* Full width on smaller screens */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for container */
+        }
+
+        /* Default (Light Mode) Container Styles */
+        .container {
+            background-color: #ffffff; /* White background for the card */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+
+        /* Dark Mode Container Styles */
+        html.dark .container {
+            background-color: #2d3748; /* Darker gray for the card */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+        }
+
+        /* Hide number input arrows for a cleaner look */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Input field styling for both modes */
+        input, select { /* Apply to both input and select */
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Default (Light Mode) Input/Select Styles */
+        input, select {
+            background-color: #ffffff;
+            border-color: #d1d5db; /* gray-300 */
+            color: #1f2937; /* gray-900 */
+        }
+
+        /* Dark Mode Input/Select Styles */
+        html.dark input,
+        html.dark select {
+            background-color: #4a5568; /* gray-700 */
+            border-color: #4a5568; /* gray-700 */
+            color: #e2e8f0; /* gray-200 */
+        }
+
+        /* Placeholder text styling */
+        input::placeholder {
+            color: #9ca3af; /* gray-400 */
+        }
+        html.dark input::placeholder {
+            color: #a0aec0; /* gray-500 */
+        }
+
+        /* Label text styling */
+        label {
+            transition: color 0.3s ease;
+        }
+        html.dark label {
+            color: #e2e8f0; /* gray-200 */
+        }
+
+        /* Results display styling */
+        .results-display {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        html.dark .results-display {
+            background-color: #4299e1; /* blue-600 */
+        }
+        .results-display span {
+            transition: color 0.3s ease;
+        }
+        html.dark .results-display span {
+            color: #e2e8f0; /* gray-200 */
+        }
+        html.dark .results-display #tipAmount,
+        html.dark .results-display #totalBill {
+            color: #ffffff; /* white */
+        }
+
+        /* Ad placeholder styling */
+        .ad-placeholder {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+        html.dark .ad-placeholder {
+            background-color: #2d3748; /* gray-700 */
+            border-color: #4a5568; /* gray-600 */
+            color: #a0aec0; /* gray-400 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container p-6 rounded-xl space-y-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Tip Calculator</h1>
+            <!-- Dark Mode Toggle Button -->
+            <button id="themeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300">
+                <!-- Sun icon for light mode (default) -->
+                <svg id="sunIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.325 6.75l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <!-- Moon icon for dark mode -->
+                <svg id="moonIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Bill Amount Input -->
+        <div class="space-y-2">
+            <label for="billAmount" class="block text-gray-700 font-medium text-lg">Bill Amount</label>
+            <input
+                type="number"
+                id="billAmount"
+                class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                placeholder="Enter bill amount"
+                min="0"
+                step="0.01"
+            >
+        </div>
+
+        <!-- Tip Percentage Dropdown -->
+        <div class="space-y-2">
+            <label for="tipPercentage" class="block text-gray-700 font-medium text-lg">Tip Percentage (%)</label>
+            <select
+                id="tipPercentage"
+                class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+            >
+                <option value="10">10%</option>
+                <option value="15" selected>15%</option> <!-- Default to 15% -->
+                <option value="20">20%</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+
+        <!-- Custom Tip Input (initially hidden) -->
+        <div id="customTipInputContainer" class="space-y-2 hidden">
+            <label for="customTip" class="block text-gray-700 font-medium text-lg">Custom Tip (%)</label>
+            <input
+                type="number"
+                id="customTip"
+                class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                placeholder="Enter custom tip percentage"
+                min="0"
+                step="0.01"
+                max="100"
+            >
+        </div>
+
+        <!-- Results Display -->
+        <div class="results-display bg-blue-50 p-4 rounded-lg space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-gray-700 font-medium text-lg">Tip Amount:</span>
+                <span id="tipAmount" class="text-blue-700 font-bold text-xl">$0.00</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-gray-700 font-medium text-lg">Total Bill:</span>
+                <span id="totalBill" class="text-blue-700 font-bold text-xl">$0.00</span>
+            </div>
+        </div>
+
+        <!-- Placeholder for Advertisement -->
+        <div class="ad-placeholder mt-8 p-4 bg-gray-100 rounded-lg text-center text-gray-600 border border-dashed border-gray-300">
+            <!-- Your AdSense or other ad network code will go here -->
+            <p class="text-sm">Advertisement space</p>
+            <p class="text-xs text-gray-500">(This will be replaced by actual ads after integration with an ad network)</p>
+        </div>
+    </div>
+
+    <script>
+        // Get references to the input and display elements
+        const billAmountInput = document.getElementById('billAmount');
+        const tipPercentageSelect = document.getElementById('tipPercentage');
+        const customTipInputContainer = document.getElementById('customTipInputContainer');
+        const customTipInput = document.getElementById('customTip');
+        const tipAmountSpan = document.getElementById('tipAmount');
+        const totalBillSpan = document.getElementById('totalBill');
+        const themeToggle = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement; // Represents the <html> tag
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+
+        /**
+         * Calculates the tip and total bill based on input values and updates the display.
+         */
+        function calculateTip() {
+            const billAmount = parseFloat(billAmountInput.value) || 0; // Default to 0 if input is empty or invalid
+            let tipPercentage = 0;
+
+            // Determine tip percentage based on dropdown selection
+            if (tipPercentageSelect.value === 'custom') {
+                tipPercentage = parseFloat(customTipInput.value) || 0;
+            } else {
+                tipPercentage = parseFloat(tipPercentageSelect.value) || 0;
+            }
+
+            // Calculate the tip amount
+            const tipAmount = (billAmount * (tipPercentage / 100)).toFixed(2);
+
+            // Calculate the total bill
+            const totalBill = (billAmount + parseFloat(tipAmount)).toFixed(2);
+
+            // Update the display spans with the calculated values
+            tipAmountSpan.textContent = `$${tipAmount}`;
+            totalBillSpan.textContent = `$${totalBill}`;
+        }
+
+        /**
+         * Toggles the dark mode on and off.
+         * Stores the preference in local storage.
+         */
+        function toggleDarkMode() {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Applies the stored theme preference on page load.
+         */
+        function applyStoredTheme() {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme === 'light') {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        // Function to filter input to allow only numbers and a single decimal point
+        function filterNumericInput(event) {
+            let value = event.target.value;
+            value = value.replace(/[^0-9.]/g, ''); // Remove non-numeric characters except dot
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join(''); // Keep only the first dot
+            }
+            event.target.value = value;
+            calculateTip(); // Recalculate after cleaning input
+        }
+
+        // Event listener for tip percentage dropdown changes
+        tipPercentageSelect.addEventListener('change', function() {
+            if (tipPercentageSelect.value === 'custom') {
+                customTipInputContainer.classList.remove('hidden'); // Show custom input
+                customTipInput.focus(); // Focus on the custom input
+            } else {
+                customTipInputContainer.classList.add('hidden'); // Hide custom input
+            }
+            calculateTip(); // Recalculate when dropdown changes
+        });
+
+        // Add event listeners
+        billAmountInput.addEventListener('input', filterNumericInput);
+        customTipInput.addEventListener('input', filterNumericInput); // Apply filter to custom tip input
+        themeToggle.addEventListener('click', toggleDarkMode);
+
+        // Initial calculations and theme application on page load
+        applyStoredTheme();
+        calculateTip();
+    </script>
+</body>
+</html>
