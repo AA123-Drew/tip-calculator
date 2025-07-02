@@ -91,8 +91,17 @@
         label {
             transition: color 0.3s ease;
         }
+        /* Explicitly set dark color for labels in light mode */
+        html.light label {
+            color: #1f2937; /* gray-900 */
+        }
         html.dark label {
             color: #e2e8f0; /* gray-200 */
+        }
+
+        /* Header text styling for light mode */
+        html.light h1 {
+            color: #000000; /* Black for light mode */
         }
 
         /* Results display styling */
